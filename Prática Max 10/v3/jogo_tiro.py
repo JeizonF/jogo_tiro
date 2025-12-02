@@ -138,9 +138,9 @@ class RoboSaltador(Robo):
         self.image = pygame.transform.scale(self.image, (70, 70))
         
 
-        self.velocidade_y = -8  
+        self.velocidade_y = -3  
         self.gravidade = 0.2 
-        self.chao_y = ALTURA - 100 
+        self.chao_y = ALTURA - 60 
         self.descida = 1
         self.direcao = 3
         self.bateu = False
