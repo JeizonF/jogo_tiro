@@ -131,7 +131,45 @@ class RoboZigueZague(Robo):
         self.atualizar_posicao()
         if self.rect.y > ALTURA:
             self.kill()
+class RoboSaltador(Robo):
+    def __init__(self, x, y):
+        super().__init__(x, y, velocidade=3)
+        self.image = pygame.image.load("v3/imagens/robo_saltador.png")
+        self.image = pygame.transform.scale(self.image, (70, 70))
+        
 
+        self.velocidade_y = -8  
+        self.gravidade = 0.2 
+        self.chao_y = ALTURA - 100 
+        self.descida = 1
+        self.direcao = 3
+        self.bateu = False
+
+    def atualizar_posicao(self):
+        
+        self.velocidade_y += self.gravidade
+        
+        self.rect.y += self.velocidade_y
+        
+        self.rect.y += self.descida
+        
+        
+        # Pro robo pular
+        if self.rect.y >= self.chao_y:
+            self.rect.y = self.chao_y 
+            self.velocidade_y = -10  # pulo
+            self.bateu = True
+
+        # Pro robo se movimentar para os lados
+        if self.bateu:
+           self.rect.x += self.direcao * 2
+
+           if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+             self.direcao *= -1
+    def update(self):
+        self.atualizar_posicao()
+        if self.rect.y > ALTURA:
+            self.kill()
 class RoboLento(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=3)
@@ -390,15 +428,16 @@ while rodando:
 
     if spawn_timer > 400:
         roboZ = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
+        roboS = RoboSaltador(random.randint(40, LARGURA - 40), -40)
         roboL = RoboLento(random.randint(40, LARGURA - 40), -40)
         roboR = RoboRapido(random.randint(40, LARGURA - 40), -40)
         roboC = RoboCiclico(random.randint(40, LARGURA - 40), -40)
         roboCa = RoboCacador(random.randint(40, LARGURA - 40), -40, jogador)
-        vida_ex = VidaExtra(random.randint(40, LARGURA - 40), -40)
+        vida_ex = VidaExtra(random.randint(40, LARGURA - 40), -40) 
         velo = Velocidade(random.randint(40, LARGURA - 40), -40)
         t_triplo = TiroTriplo(random.randint(40, LARGURA - 40), -40)
-        todos_sprites.add(velo,t_triplo, vida_ex)
-        inimigos.add()
+        todos_sprites.add(roboC,roboZ,roboL,roboR,roboS,roboCa,vida_ex,velo,t_triplo)
+        inimigos.add(roboC,roboZ,roboL,roboR,roboCa,roboS)
         power_up.add(velo,t_triplo, vida_ex)
         spawn_timer = 0
 
