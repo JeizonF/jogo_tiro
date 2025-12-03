@@ -1,6 +1,7 @@
 import pygame
 from sons import * 
 import random
+import math
 
 
 pygame.init()
@@ -207,63 +208,32 @@ class RoboRapido(Robo):
 
 class RoboCiclico(Robo):
     def __init__(self, x, y):
-        super().__init__(x, y, velocidade=3)
-        self.image = pygame.image.load("v4/imagens/robo_ciclico.png")
+        super().__init__(x, y, velocidade=2)
+        self.image = pygame.image.load("v3/imagens/robo_ciclico.png")
         self.image = pygame.transform.scale(self.image, (70, 70))
 
-
-        self.etapa = 0          # qual parte do ciclo está (0 a 3)
-        self.contador = 0       # quanto já andou dentro de uma etapa
-        self.tamanho = 40      
-        self.direcao = 3
-        
+        self.centro_x = x
+        self.centro_y = y
+        self.raio = 60
+        self.angulo = 0
+        self.velocidade_angular = 0.08
 
     def atualizar_posicao(self):
-    
-        if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
-            self.direcao *= -1
-            self.rect.x += self.direcao *10
-              
-        # 0 = direita
-        if self.etapa == 0:
-            self.rect.x += self.direcao
-            self.contador += 1
-            if self.contador >= self.tamanho:
-                self.etapa = 1
-                self.contador = 0
-            
+       
+        self.angulo += self.velocidade_angular  # aumenta o ângulo constantemente
 
-        # 1 = baixo
-        elif self.etapa == 1:
-            self.rect.y += self.velocidade
-            self.contador += 1
-            if self.contador >= self.tamanho:
-                self.etapa = 2
-                self.contador = 0
+        # cálculos para o movimento circular
+        self.rect.x = self.centro_x + self.raio * math.cos(self.angulo)
+        self.rect.y = self.centro_y + self.raio * math.sin(self.angulo)
 
-        # 2 = esquerda
-        elif self.etapa == 2:
-            self.rect.x -= self.direcao
-            self.contador += 1
-            if self.contador >= self.tamanho:
-                self.etapa = 3
-                self.contador = 0
-
-        # 3 = cima
-        elif self.etapa == 3:
-            self.rect.y -= self.velocidade
-            self.contador += 1
-            if self.contador >= self.tamanho:
-                self.etapa = 0
-                self.contador = 0
-
-      
-        self.rect.y += 1
+        # movimento do centro para baixo (faz descer)
+        self.centro_y += 1
 
     def update(self):
         self.atualizar_posicao()
-        if self.rect.y > ALTURA:
+        if self.rect.y > ALTURA + 50:
             self.kill()
+
 
 class RoboCacador(Robo):
     def __init__(self, x, y, alvo):
