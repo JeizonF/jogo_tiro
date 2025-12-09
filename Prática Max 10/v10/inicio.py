@@ -22,8 +22,8 @@ def mostrar_inicio():
     estado = 'menu'
 
     logo = pygame.image.load(img('naveDoJogo.png')).convert_alpha()
-    logo = pygame.transform.scale(logo, (100 * 3, 30 * 5))
-    logo_x = 250
+    logo = pygame.transform.scale(logo, (50 * 3, 30 * 5))
+    logo_x = 330
     logo_y = 200
 
     logo_vel = 60.0
