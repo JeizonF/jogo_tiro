@@ -27,7 +27,8 @@ clock = pygame.time.Clock()
 
 dificuldade = "medio" 
 spawn_intervalo = 400 
-velocidade_multiplicador = 1.0 
+velocidade_multiplicador = 1.0
+dano_multi = 1
 
 class Entidade(pygame.sprite.Sprite):
     def __init__(self, x, y, velocidade):
@@ -117,6 +118,7 @@ class Robo(Entidade):
         super().__init__(x, y, velocidade)
         self.image.fill((255, 0, 0))
         self.tipo = "normal"
+        self.dano = dano_multi
 
     def atualizar_posicao(self):
         raise NotImplementedError
@@ -316,7 +318,7 @@ class TiroTriplo(Entidade):
         self.atualizar_posicao()
 
 def menu():
-    global dificuldade, spawn_intervalo, velocidade_multiplicador
+    global dificuldade, spawn_intervalo, velocidade_multiplicador, dano_multi
     menu_rodando = True
     opcao_selecionada = 0
     opcoes = ["Facil", "Medio", "Dificil"]
@@ -340,13 +342,16 @@ def menu():
                     dificuldade = opcoes[opcao_selecionada].lower()
                     if dificuldade == "facil":
                         spawn_intervalo = 600
+                        dano_multi = 1
                         velocidade_multiplicador = 0.8
                     elif dificuldade == "medio":
                         spawn_intervalo = 400
                         velocidade_multiplicador = 1.0
+                        dano_multi = 2
                     elif dificuldade == "dificil":
                         spawn_intervalo = 250
                         velocidade_multiplicador = 1.5
+                        dano_multi = 3
                     menu_rodando = False
         
         TELA.blit(background, (0, 0))
@@ -363,7 +368,7 @@ def menu():
         TELA.blit(instrucoes, (LARGURA // 2 - instrucoes.get_width() // 2, 450))
         
         pygame.display.flip()
-
+menu()
 power_up = pygame.sprite.Group()
 todos_sprites = pygame.sprite.Group()
 inimigos = pygame.sprite.Group()
@@ -469,9 +474,10 @@ while rodando:
                 jogador.tiro_triplo = True
                 jogador.buff_tiro_tempo = 5 * FPS
 
-    if pygame.sprite.spritecollide(jogador, inimigos, True):
+    colisao_inimigo = pygame.sprite.spritecollide(jogador, inimigos, True)
+    for inimigo in colisao_inimigo:
         Sons.som_morte()
-        jogador.vida -= 1
+        jogador.vida -= inimigo.dano
         if jogador.vida <= 0:
             print("GAME OVER!")
             rodando = False
