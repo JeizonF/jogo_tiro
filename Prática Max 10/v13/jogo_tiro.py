@@ -556,11 +556,13 @@ def jogo():
                     if inimigo.vida <= 0:
                         inimigo.kabum(inimigo.rect.centerx, inimigo.rect.centery)
                         inimigo.kill()
+                        pontos += 1
                 elif inimigo.tipo == "chefao":
                     inimigo.vida-= len(lista_tiros)
                     if inimigo.vida <= 0:
                         inimigo.kabum(inimigo.rect.centerx, inimigo.rect.centery)
                         inimigo.kill()
+                        pontos += 10
                         chefao_vivo = None
                         if chefao_vivo is None:
                             roboChe = RoboChefao(random.randint(200, LARGURA - 40), -100)
