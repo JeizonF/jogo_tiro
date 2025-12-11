@@ -388,7 +388,7 @@ def jogo():
             if self.rect.y > ALTURA:
                 self.kill()
 
-    codigo_secreto = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
+    codigo_secreto = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d,pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_a, pygame.K_d, pygame.K_a,pygame.K_s, pygame.K_w, pygame.K_w, pygame.K_s]
     entrada = []
 
     def menu():
@@ -501,15 +501,15 @@ def jogo():
                     tiros.add(tiro)
 
                     if jogador.tiro_triplo:
-                        tiro2 = Tiro2(jogador.rect.centerx, jogador.rect.y)
-                        tiro3 = Tiro3(jogador.rect.centerx, jogador.rect.y)
+                        tiro2 = Tiro2(jogador.rect.centerx + 25, jogador.rect.y)
+                        tiro3 = Tiro3(jogador.rect.centerx + 25, jogador.rect.y)
                         todos_sprites.add(tiro2, tiro3)
                         tiros.add(tiro2, tiro3)
                     if jogador.tiro_cinco:
-                        tiro2 = Tiro2(jogador.rect.centerx, jogador.rect.y)
-                        tiro3 = Tiro3(jogador.rect.centerx, jogador.rect.y)
-                        tiro4 = Tiro4(jogador.rect.centerx, jogador.rect.y)
-                        tiro5 = Tiro5(jogador.rect.centerx, jogador.rect.y)
+                        tiro2 = Tiro2(jogador.rect.centerx + 25, jogador.rect.y)
+                        tiro3 = Tiro3(jogador.rect.centerx + 25, jogador.rect.y)
+                        tiro4 = Tiro4(jogador.rect.centerx + 25, jogador.rect.y)
+                        tiro5 = Tiro5(jogador.rect.centerx + 25, jogador.rect.y)
                         todos_sprites.add(tiro2, tiro3, tiro4, tiro5)
                         tiros.add(tiro2, tiro3,tiro4,tiro5)
                         
