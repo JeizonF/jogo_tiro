@@ -379,9 +379,9 @@ def jogo():
     class Secreto(Entidade):
         def __init__(self, x, y):
             super().__init__(x, y, 3)
+            self.image = pygame.image.load(img("EasterEgg2.png"))
+            self.image = pygame.transform.scale(self.image, (50 * 2, 50 * 2))
             self.tipo = "secreto"
-            self.image = pygame.Surface((40, 40))
-            self.image.fill((255, 255, 0))
 
         def update(self):
             self.rect.y += self.velocidade
