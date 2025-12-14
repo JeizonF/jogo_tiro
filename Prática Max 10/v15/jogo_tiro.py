@@ -663,5 +663,6 @@ def jogo():
 
         pygame.display.flip()
 
+    mostrar_game_over(pontos)
     pygame.quit()
     return pontos
