@@ -585,7 +585,7 @@ def jogo():
                         tema.parar()
                         loop_pause()
 
-        spawn_timer += 20
+        spawn_timer += 1
         if spawn_timer > spawn_intervalo:
             roboZ = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
             roboS = RoboSaltador(random.randint(40, LARGURA - 40), -40)
