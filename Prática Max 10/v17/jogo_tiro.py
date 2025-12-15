@@ -451,7 +451,6 @@ def jogo():
     inimigos = pygame.sprite.Group()
     tiros = pygame.sprite.Group()
 
-    # REMOVIDO: Todo código do RoboChefao
 
     jogador = Jogador(LARGURA // 2, ALTURA - 60)
     todos_sprites.add(jogador)
@@ -476,7 +475,7 @@ def jogo():
     def loop_pause():
         pausado = True
         while pausado:
-            clock.tick(15)  # baixo consumo
+            clock.tick(15)  
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -488,10 +487,10 @@ def jogo():
                         tema.continuar()
                         pausado = False
 
-            # LIMPA A TELA (ESSENCIAL)
+            # LIMPA A TELA
             TELA.blit(background, (0, 0))
 
-            # DESENHA JOGO CONGELADO
+            # JOGO CONGELADO
             todos_sprites.draw(TELA)
 
             # TRANSPARENTE
