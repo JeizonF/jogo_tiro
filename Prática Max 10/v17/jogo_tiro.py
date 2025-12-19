@@ -216,7 +216,7 @@ def jogo():
     class RoboSaltador(Robo):
         def __init__(self, x, y):
             super().__init__(x, y, velocidade=3)
-            self.image = pygame.image.load(img("robo_saltador.png"))
+            self.image = pygame.image.load(img("Robo Saltador.png"))
             self.image = pygame.transform.scale(self.image, (70, 70))
 
             self.velocidade_y = -2 * velocidade_multiplicador
