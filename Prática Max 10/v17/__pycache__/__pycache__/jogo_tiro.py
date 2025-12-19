@@ -4,7 +4,6 @@ import random
 import math
 from sons import Sons, Tema
 from inicio import *
-from fase_boss import *
 
 dificuldade = "medio"
 spawn_intervalo = 400 
@@ -24,6 +23,7 @@ def jogo():
     def font(nome_fonte):
        return os.path.join(FONT_DIR, nome_fonte)
 
+
     pygame.init()
 
     LARGURA = 800
@@ -38,6 +38,8 @@ def jogo():
     FPS = 60
     clock = pygame.time.Clock()
     
+
+
     class Entidade(pygame.sprite.Sprite):
         def __init__(self, x, y, velocidade):
             super().__init__()
@@ -48,6 +50,7 @@ def jogo():
         def mover(self, dx, dy):
             self.rect.x += dx
             self.rect.y += dy
+
 
     class Jogador(Entidade):
         def __init__(self, x, y):
@@ -78,6 +81,7 @@ def jogo():
             if transformado == True:
                 self.rect.clamp_ip(TELA.get_rect())
 
+
             if self.buff_tiro_tempo > 0:
                 self.buff_tiro_tempo -= 1
                 if self.buff_tiro_tempo <= 0:
@@ -86,6 +90,7 @@ def jogo():
                 self.buff_velocidade_tempo -= 1
                 if self.buff_velocidade_tempo <= 0:
                     self.velocidade = 5 * velocidade_multiplicador
+
 
     class Tiro(Entidade):
         def __init__(self, x, y):
@@ -98,6 +103,7 @@ def jogo():
             self.rect.y -= self.velocidade
             if self.rect.y < 0:
                 self.kill()
+
 
     class Tiro2(Entidade):
         def __init__(self, x, y):
@@ -112,6 +118,7 @@ def jogo():
             if self.rect.y < 0:
                 self.kill()
 
+
     class Tiro3(Entidade):
         def __init__(self, x, y):
             super().__init__(x, y, 10)
@@ -124,7 +131,6 @@ def jogo():
             self.rect.x += self.direcao * 5
             if self.rect.y < 0:
                 self.kill()
-    
     class Tiro4(Entidade):
         def __init__(self, x, y):
             super().__init__(x, y, 10)
@@ -136,7 +142,6 @@ def jogo():
             self.rect.x += -self.direcao *10
             if self.rect.y < 0:
                 self.kill()
-    
     class Tiro5(Entidade):
         def __init__(self, x, y):
             super().__init__(x, y, 10)
@@ -150,6 +155,7 @@ def jogo():
             if self.rect.y < 0:
                 self.kill()
 
+
     class Robo(Entidade):
         def __init__(self, x, y, velocidade):
             super().__init__(x, y, velocidade)
@@ -160,46 +166,19 @@ def jogo():
 
         def atualizar_posicao(self):
             raise NotImplementedError
-        
+
         def kabum(self, x, y):
-            explosao = Explosao(x, y)
-            todos_sprites.add(explosao)
-            Sons.som_morte()
-
-    class Explosao(pygame.sprite.Sprite):
-        def __init__(self, x, y):
-            super().__init__()
-            self.frames = [
-                pygame.transform.scale(pygame.image.load(img("morte1.png")), (80, 80)),
-                pygame.transform.scale(pygame.image.load(img("morte2.png")), (80, 80)),
-                pygame.transform.scale(pygame.image.load(img("morte3.png")), (80, 80)),
-                pygame.transform.scale(pygame.image.load(img("morte4.png")), (80, 80)),
-            ]
-
-            self.frame_atual = 0
-            self.image = self.frames[self.frame_atual]
-            self.rect = self.image.get_rect(center=(x, y))
-
-            self.contador = 0
-            self.velocidade_animacao = 5
-
-        def update(self):
-            self.contador += 1
-            if self.contador >= self.velocidade_animacao:
-                self.contador = 0
-                self.frame_atual += 1
-
-                if self.frame_atual >= len(self.frames):
-                    self.kill()
-                else:
-                    self.image = self.frames[self.frame_atual]
-
+            explosao = pygame.image.load(img("morte.png"))
+            explosao = pygame.transform.scale(explosao, (80, 80))
+            TELA.blit(explosao, (x - 40, y - 40))
+            pygame.display.flip()
+            pygame.time.delay(10)
             
     class RoboZigueZague(Robo):
         def __init__(self, x, y):
             super().__init__(x, y, velocidade=3)
             self.direcao = 1
-            self.image = pygame.image.load(img("roboZigueZague.png"))
+            self.image = pygame.image.load(img("robo_ziguezague.png"))
             self.image = pygame.transform.scale(self.image, (70, 70))
 
         def atualizar_posicao(self):
@@ -212,6 +191,7 @@ def jogo():
             self.atualizar_posicao()
             if self.rect.y > ALTURA:
                 self.kill()
+
 
     class RoboSaltador(Robo):
         def __init__(self, x, y):
@@ -238,7 +218,7 @@ def jogo():
 
             if self.bateu:
                 self.rect.x += self.direcao * 2
-                if self.rect.x <= 0 or self.rect.x >= LARGURA - 70:
+                if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
                     self.direcao *= -1
 
         def update(self):
@@ -246,11 +226,12 @@ def jogo():
             if self.rect.y > ALTURA:
                 self.kill()
 
+
     class RoboLento(Robo):
         def __init__(self, x, y):
             super().__init__(x, y, velocidade=3)
             self.direcao = 1
-            self.image = pygame.image.load(img("roboLento.png"))
+            self.image = pygame.image.load(img("robo_lento.png"))
             self.image = pygame.transform.scale(self.image, (70, 70))
 
         def atualizar_posicao(self):
@@ -261,11 +242,12 @@ def jogo():
             if self.rect.y > ALTURA:
                 self.kill()
 
+
     class RoboRapido(Robo):
         def __init__(self, x, y):
             super().__init__(x, y, velocidade=3)
             self.direcao = 1
-            self.image = pygame.image.load(img("roboRapido.png"))
+            self.image = pygame.image.load(img("robo_rapido.png"))
             self.image = pygame.transform.scale(self.image, (70, 70))
 
         def atualizar_posicao(self):
@@ -276,10 +258,11 @@ def jogo():
             if self.rect.y > ALTURA:
                 self.kill()
 
+
     class RoboCiclico(Robo):
         def __init__(self, x, y):
             super().__init__(x, y, velocidade=2)
-            self.image = pygame.image.load(img("roboCiclico.png"))
+            self.image = pygame.image.load(img("robo_ciclico.png"))
             self.image = pygame.transform.scale(self.image, (70, 70))
 
             self.centro_x = x
@@ -299,16 +282,21 @@ def jogo():
             if self.rect.y > ALTURA + 50:
                 self.kill()
 
+
     class RoboCacador(Robo):
         def __init__(self, x, y, alvo):
             super().__init__(x, y, velocidade=3)
-            self.image = pygame.image.load(img("roboCacador.png"))
+            self.image = pygame.image.load(img("robo_cacador.png"))
             self.image = pygame.transform.scale(self.image, (70, 70))
             self.alvo = alvo
 
         def atualizar_posicao(self):
+            
+           
             if self.rect.x < self.alvo.rect.x - self.velocidade:
                 self.rect.x += self.velocidade
+
+           
             elif self.rect.x > self.alvo.rect.x + self.velocidade:
                 self.rect.x -= self.velocidade
 
@@ -316,11 +304,29 @@ def jogo():
                 self.rect.y += self.velocidade
             elif self.rect.y > self.alvo.rect.y:
                 self.rect.y -= self.velocidade
-        
+     
         def update(self):
             self.atualizar_posicao()
             if self.rect.y > ALTURA:
                 self.kill()
+
+
+    class RoboChefao(Robo):
+        def __init__(self, x, y):
+            super().__init__(x, y, velocidade=3)
+            self.image = pygame.image.load(img("robo_chefao.png"))
+            self.image = pygame.transform.scale(self.image, (70, 70))
+            self.vida = 30
+            self.tipo = "chefao"
+
+        def atualizar_posicao(self):
+            self.rect.y = 200
+
+        def update(self):
+            self.atualizar_posicao()
+            if self.rect.y > ALTURA:
+                self.kill()
+
 
     class VidaExtra(Entidade):
         def __init__(self, x, y):
@@ -333,11 +339,12 @@ def jogo():
         def atualizar_posicao(self):
             self.rect.y += self.velocidade
             self.rect.x += self.direcao
-            if self.rect.x <= 0 or self.rect.x >= LARGURA - 70:
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
                 self.direcao *= -1
 
         def update(self):
             self.atualizar_posicao()
+
 
     class Velocidade(Entidade):
         def __init__(self, x, y):
@@ -350,11 +357,12 @@ def jogo():
         def atualizar_posicao(self):
             self.rect.y += self.velocidade
             self.rect.x += self.direcao
-            if self.rect.x <= 0 or self.rect.x >= LARGURA - 70:
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 105:
                 self.direcao *= -1
 
         def update(self):
             self.atualizar_posicao()
+
 
     class TiroTriplo(Entidade):
         def __init__(self, x, y):
@@ -367,11 +375,12 @@ def jogo():
         def atualizar_posicao(self):
             self.rect.y += self.velocidade
             self.rect.x += self.direcao
-            if self.rect.x <= 0 or self.rect.x >= LARGURA - 75:
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 105:
                 self.direcao *= -1
 
         def update(self):
             self.atualizar_posicao()
+    
     
     class Secreto(Entidade):
         def __init__(self, x, y):
@@ -387,6 +396,8 @@ def jogo():
 
     codigo_secreto = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d,pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_a, pygame.K_d, pygame.K_a,pygame.K_s, pygame.K_w, pygame.K_w, pygame.K_s]
     entrada = []
+
+
 
     def menu():
         global dificuldade, spawn_intervalo, velocidade_multiplicador, vida_multi, dano_multi, transformado
@@ -438,10 +449,10 @@ def jogo():
                 texto_opcao = font_opcao.render(opcao, True, cor)
                 TELA.blit(texto_opcao, (LARGURA // 2 - texto_opcao.get_width() // 2, 250 + selecionado * 50))
             
-            linha1 = font_opcao.render("Use as setas para navegar", True, (255, 255, 255))
-            linha2 = font_opcao.render("e Enter para selecionar", True, (255, 255, 255))
-            TELA.blit(linha1, (LARGURA // 2 - linha1.get_width() // 2, 440))
-            TELA.blit(linha2, (LARGURA // 2 - linha2.get_width() // 2, 480))
+                linha1 = font_opcao.render("Use as setas para navegar", True, (255, 255, 255))
+                linha2 = font_opcao.render("e Enter para selecionar", True, (255, 255, 255))
+                TELA.blit(linha1, (LARGURA // 2 - linha1.get_width() // 2, 440))
+                TELA.blit(linha2, (LARGURA // 2 - linha2.get_width() // 2, 480))
                         
             pygame.display.flip()
 
@@ -452,8 +463,16 @@ def jogo():
     tiros = pygame.sprite.Group()
 
 
+    chefao_vivo = None
+    if chefao_vivo is None:
+        roboChe = RoboChefao(random.randint(200, LARGURA - 40), -100)
+        todos_sprites.add(roboChe)
+        inimigos.add(roboChe)
+        chefao_vivo = roboChe
+
     jogador = Jogador(LARGURA // 2, ALTURA - 60)
     todos_sprites.add(jogador)
+
 
     pontos = 0
     spawn_timer = 0
@@ -463,6 +482,7 @@ def jogo():
     coracao_vazio = pygame.image.load(img("coracao_vazio.png"))
     coracao_vazio = pygame.transform.scale(coracao_vazio, (32, 32))
     vida_maxima = jogador.vida
+
 
     def desenhar_coracoes(tela, vida_atual, vida_maxima, cor_cheio, cor_vazio):
         for i in range(vida_maxima):
@@ -475,7 +495,7 @@ def jogo():
     def loop_pause():
         pausado = True
         while pausado:
-            clock.tick(15)  
+            clock.tick(15)  # baixo consumo
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -487,10 +507,10 @@ def jogo():
                         tema.continuar()
                         pausado = False
 
-            # LIMPA A TELA
+            # LIMPA A TELA (ESSENCIAL)
             TELA.blit(background, (0, 0))
 
-            # JOGO CONGELADO
+            # DESENHA JOGO CONGELADO
             todos_sprites.draw(TELA)
 
             # TRANSPARENTE
@@ -505,9 +525,7 @@ def jogo():
 
     rodando = True
     while rodando:
-        if pontos >= 100:
-           Fase_boss(pontos)
-         
+      
         tema.som_tema()
         clock.tick(FPS)
 
@@ -520,9 +538,11 @@ def jogo():
                     tema.parar()
                     loop_pause()
             
+
             if jogador.transformado:
                 
                 if event.type == pygame.KEYDOWN:
+
                     if event.key == pygame.K_SPACE:
                         tiro = Tiro(jogador.rect.centerx + 25, jogador.rect.y+40)
                         todos_sprites.add(tiro)
@@ -543,6 +563,7 @@ def jogo():
             elif jogador.transformado == False:
 
                 if event.type == pygame.KEYDOWN:
+
                     if event.key == pygame.K_SPACE:
                         tiro = Tiro(jogador.rect.centerx + 25, jogador.rect.y)
                         todos_sprites.add(tiro)
@@ -560,7 +581,7 @@ def jogo():
                             tiro5 = Tiro5(jogador.rect.centerx + 25, jogador.rect.y)
                             todos_sprites.add(tiro2, tiro3, tiro4, tiro5)
                             tiros.add(tiro2, tiro3,tiro4,tiro5)
-                
+                        
 
                 if event.type == pygame.KEYDOWN:
                     entrada.append(event.key)
@@ -584,6 +605,8 @@ def jogo():
                         tema.parar()
                         loop_pause()
 
+
+
         spawn_timer += 1
         if spawn_timer > spawn_intervalo:
             roboZ = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
@@ -603,17 +626,29 @@ def jogo():
 
         colisoes = pygame.sprite.groupcollide(inimigos, tiros, False, True)
         for inimigo, lista_tiros in colisoes.items():
-            if inimigo.tipo == "normal":
-                inimigo.vida-= len(lista_tiros)
-                if inimigo.vida <= 0:
+                if inimigo.tipo == "normal":
+                    inimigo.vida-= len(lista_tiros)
+                    if inimigo.vida <= 0:
+                        inimigo.kabum(inimigo.rect.centerx, inimigo.rect.centery)
+                        inimigo.kill()
+                        pontos += 1
+                elif inimigo.tipo == "chefao":
+                    inimigo.vida-= len(lista_tiros)
+                    if inimigo.vida <= 0:
+                        inimigo.kabum(inimigo.rect.centerx, inimigo.rect.centery)
+                        inimigo.kill()
+                        pontos += 10
+                        chefao_vivo = None
+                        if chefao_vivo is None:
+                            roboChe = RoboChefao(random.randint(200, LARGURA - 40), -100)
+                            todos_sprites.add(roboChe)
+                            inimigos.add(roboChe)
+                else:
                     inimigo.kabum(inimigo.rect.centerx, inimigo.rect.centery)
                     inimigo.kill()
+                    Sons.som_morte()
                     pontos += 1
-            else:
-                inimigo.kabum(inimigo.rect.centerx, inimigo.rect.centery)
-                inimigo.kill()
-                Sons.som_morte()
-                pontos += 1
+
 
         colisao_power = pygame.sprite.spritecollide(jogador, power_up, True)
         if colisao_power:
@@ -625,9 +660,8 @@ def jogo():
                     if vida_maxima < 10:
                         vida_maxima = 10
                 elif p.tipo == "velocidade":
-                    if not jogador.transformado:
-                        jogador.velocidade = 10
-                        jogador.buff_velocidade_tempo = 5 * FPS
+                    jogador.velocidade = 10
+                    jogador.buff_velocidade_tempo = 5 * FPS
                 elif p.tipo == "tiro":
                     jogador.tiro_triplo = True
                     jogador.buff_tiro_tempo = 5 * FPS
@@ -652,6 +686,7 @@ def jogo():
                 print("GAME OVER!")
                 rodando = False 
 
+
         todos_sprites.update()
 
         TELA.blit(background, (0, 0))
@@ -664,6 +699,4 @@ def jogo():
 
         pygame.display.flip()
 
-    mostrar_game_over(pontos)
     pygame.quit()
-    return pontos

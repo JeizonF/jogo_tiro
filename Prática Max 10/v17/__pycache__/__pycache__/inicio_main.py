@@ -1,4 +1,4 @@
-from inicio import  *
+from inicio import mostrar_inicio
 from jogo_tiro import jogo
 
 def main():
@@ -7,3 +7,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    

@@ -19,6 +19,8 @@ def jogo():
     IMG_DIR = os.path.join(BASE_DIR, "imagens")
     FONT_DIR = os.path.join(BASE_DIR, RESOURCE_DIR, "fonts")
 
+    pontos = 0
+
     def img(nome_arquivo):
         return os.path.join(IMG_DIR, nome_arquivo)
     def font(nome_fonte):
@@ -205,7 +207,7 @@ def jogo():
         def atualizar_posicao(self):
             self.rect.y += self.velocidade
             self.rect.x += self.direcao * 3
-            if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 70:
                 self.direcao *= -1
 
         def update(self):
@@ -333,7 +335,7 @@ def jogo():
         def atualizar_posicao(self):
             self.rect.y += self.velocidade
             self.rect.x += self.direcao
-            if self.rect.x <= 0 or self.rect.x >= LARGURA - 70:
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 60:
                 self.direcao *= -1
 
         def update(self):
@@ -455,7 +457,7 @@ def jogo():
     jogador = Jogador(LARGURA // 2, ALTURA - 60)
     todos_sprites.add(jogador)
 
-    pontos = 0
+    pontos = 100
     spawn_timer = 0
 
     coracao = pygame.image.load(img("coracao.png"))
@@ -505,11 +507,158 @@ def jogo():
 
     rodando = True
     while rodando:
+        
         if pontos >= 100:
-           Fase_boss(pontos)
-         
+            class Tiro(Entidade):
+                def __init__(self, x, y, dx=0):
+                    super().__init__(x, y, 10)
+                    self.image = pygame.image.load(img("tiro.png"))
+                    self.image = pygame.transform.scale(self.image, (20, 20))
+                    self.rect = self.image.get_rect(center=(x, y))
+                    self.dx = dx
+                    Sons.som_tiro()
+
+
+                def update(self):
+                    self.rect.y -= self.vel
+                    self.rect.x += self.dx
+                    if self.rect.bottom < 0:
+                        self.kill()
+
+
+            class TiroBoss(Entidade):  
+                def __init__(self, x, y, dx=0):
+                    super().__init__(x, y, 5)
+                    self.image = pygame.Surface((20, 20))
+                    self.image.fill((255, 255, 0))  
+                    pygame.draw.rect(self.image, (255, 200, 0), (0, 0, 20, 20), 2)  
+                    self.rect = self.image.get_rect(center=(x, y))
+                    self.dx = dx
+
+
+                def update(self):
+                    self.rect.y += self.vel  
+                    self.rect.x += self.dx
+                    if self.rect.top > ALTURA:
+                        self.kill()
+
+
+            class Boss:
+                def __init__(self):
+                    self.rect = pygame.Rect(100, 40, 600, 80)
+                    self.vida = 1000  
+                    self.vida_max = 1000
+                    self.cooldown = 0
+                    self.fase = 1  # NOVA: controla a fase do boss
+
+
+                def atacar(self, tiros_boss_group):
+                    self.cooldown += 1
+                    
+                    # Verifica se deve ativar fase 2
+                    if self.vida <= 500 and self.fase == 1:
+                        self.fase = 2
+                    
+                    if self.fase == 1:
+                        cooldown_max = 60  # Fase 1: normal
+                        if self.cooldown > cooldown_max:
+                            centro_x = self.rect.centerx
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom))          # Central
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, -4))      # Esq 1
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, -2))      # Esq 2
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, 2))       # Dir 1
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, 4))       # Dir 2
+                            self.cooldown = 0
+                    else:  # Fase 2: mais difícil
+                        cooldown_max = 30  # Aumenta frequência (2x mais rápido)
+                        if self.cooldown > cooldown_max:
+                            centro_x = self.rect.centerx
+                            # 7 tiros: 5 originais + 2 extras nas bordas
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom))          # Central
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, -4))      # Esq 1
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, -2))      # Esq 2
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, 2))       # Dir 1
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, 4))       # Dir 2
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, -6))      # Esq extra
+                            tiros_boss_group.add(TiroBoss(centro_x, self.rect.bottom, 6))       # Dir extra
+                            self.cooldown = 0
+
+
+                def desenhar(self):
+                    cor = (200, 0, 0) if self.fase == 1 else (255, 100, 0)  # Vermelho -> Laranja na fase 2
+                    pygame.draw.rect(TELA, cor, self.rect)
+                    
+                    barra_largura = 600
+                    barra_altura = 15
+                    barra_x = 100
+                    barra_y = self.rect.bottom + 5
+                    
+                    pygame.draw.rect(TELA, (100, 100, 100), (barra_x, barra_y, barra_largura, barra_altura))
+                    
+                    vida_percent = self.vida / self.vida_max
+                    cor_vida = (0, 255, 0) if vida_percent > 0.5 else (255, 255, 0) if vida_percent > 0.25 else (255, 0, 0)
+                    largura_vida = int(barra_largura * vida_percent)
+                    pygame.draw.rect(TELA, cor_vida, (barra_x, barra_y, largura_vida, barra_altura))
+                    
+                    pygame.draw.rect(TELA, (255, 255, 255), (barra_x, barra_y, barra_largura, barra_altura), 2)
+                    
+                    font = pygame.font.SysFont(None, 24)
+                    texto_vida = font.render(f"BOSS: {self.vida}/1000", True, (255, 255, 255))
+                    TELA.blit(texto_vida, (barra_x + 10, barra_y - 25))
+
+            boss = Boss()
+            tiros_boss = pygame.sprite.Group()
+
+            for t in tiros_boss:
+                if t.rect.colliderect(jogador.rect):
+                    jogador.vida -= 1
+                    t.kill()
+
+
+            buffs_coletados = pygame.sprite.spritecollide(jogador, power_up, True)
+            for buff in buffs_coletados:
+                if buff.tipo == "vida" and jogador.vida < 10:
+                    jogador.vida += 1
+                elif buff.tipo == "velocidade":
+                    jogador.vel = 8
+                    jogador.buff_vel = 600
+                elif buff.tipo == "tiro":
+                    jogador.tiro_triplo = True
+                    jogador.buff_tiro = 600
+
+
+            todos_sprites.update()
+
+
+            for t in pygame.sprite.spritecollide(boss, tiros, True):
+                boss.vida -= 1
+
+
+            if boss.vida <= 0 or jogador.vida <= 0:
+                rodando = False
+            if random.randint(1, 400) == 1:
+                buff = random.choice([
+                    VidaExtra(random.randint(40, LARGURA-40), -40),
+                    Velocidade(random.randint(40, LARGURA-40), -40),
+                    TiroTriplo(random.randint(40, LARGURA-40), -40)
+                ])
+                power_up.add(buff)
+                todos_sprites.add(buff)
+
+
+            TELA.blit(background, (0, 0))
+            todos_sprites.draw(TELA)
+            tiros_boss.draw(TELA)
+            boss.desenhar()
+            pygame.display.flip()
+
+
+        pygame.quit()
+                
         tema.som_tema()
         clock.tick(FPS)
+        boss.atacar(tiros_boss)
+        tiros_boss.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -596,8 +745,8 @@ def jogo():
             velo = Velocidade(random.randint(40, LARGURA - 40), -40)
             t_triplo = TiroTriplo(random.randint(40, LARGURA - 40), -40)
             roboC = RoboCiclico(random.randint(40, LARGURA - 40), -40)
-            todos_sprites.add(roboL,roboZ,roboS,roboR, roboC, roboCa, vida_ex, velo, t_triplo)
-            inimigos.add(roboL,roboZ,roboS,roboR, roboC, roboCa)
+            todos_sprites.add(roboC, roboCa,roboL,roboR,roboS,roboZ,vida_ex, velo, t_triplo)
+            inimigos.add(roboC, roboCa,roboL,roboR,roboS,roboZ)
             power_up.add(velo, t_triplo, vida_ex)
             spawn_timer = 0
 
@@ -625,9 +774,8 @@ def jogo():
                     if vida_maxima < 10:
                         vida_maxima = 10
                 elif p.tipo == "velocidade":
-                    if not jogador.transformado:
-                        jogador.velocidade = 10
-                        jogador.buff_velocidade_tempo = 5 * FPS
+                    jogador.velocidade = 10
+                    jogador.buff_velocidade_tempo = 5 * FPS
                 elif p.tipo == "tiro":
                     jogador.tiro_triplo = True
                     jogador.buff_tiro_tempo = 5 * FPS
