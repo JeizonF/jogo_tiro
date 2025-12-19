@@ -49,7 +49,7 @@ def mostrar_inicio():
     estado = "creditos"
     velocidade_creditos = 40  
     y_creditos = ALTURA + 20
-    tempo_creditos += 1
+    
 
 
     while True:
